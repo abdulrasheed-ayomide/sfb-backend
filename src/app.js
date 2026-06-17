@@ -23,8 +23,11 @@ const allowedOrigins = [
   config.server.clientUrl,
   'http://localhost:3000',
   'http://localhost:5173',
+   'https://spring-fin-bank.vercel.app',
 ].filter(Boolean);
 
+console.log('CLIENT_URL:', config.server.clientUrl);
+console.log('ALLOWED_ORIGINS:', allowedOrigins);
 app.use(
   cors({
     origin: (origin, callback) => {

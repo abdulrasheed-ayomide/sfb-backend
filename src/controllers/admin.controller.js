@@ -1,6 +1,8 @@
 const asyncHandler = require('../utils/asyncHandler');
 const adminService = require('../services/admin.service');
 const transactionService = require('../services/transaction.service');
+const User = require('../models/User');
+const Transaction = require('../models/Transaction');
 
 const getActor = (req) => ({
   actorType: 'admin',
@@ -220,6 +222,45 @@ const updateAdminStatus = asyncHandler(async (req, res) => {
   });
 });
 
+// @route DELETE /api/v1/admin/users/:id
+//  * @desc Delete a user account (soft delete or hard delete based on your preference)
+//  * @access Admins only
+//  * @param {ObjectId} params.id - User ID to delete
+
+const deleteUser = asyncHandler(async (req, res) => {
+  const user = await User.findByIdAndDelete(req.params.id);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: 'User not found',
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'User deleted successfully',
+  });
+});
+
+const deleteTransaction = asyncHandler(async (req, res) => {
+  const transaction = await Transaction.findByIdAndDelete(
+    req.params.id
+  );
+
+  if (!transaction) {
+    return res.status(404).json({
+      success: false,
+      message: 'Transaction not found',
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Transaction deleted successfully',
+  });
+});
+
 module.exports = {
   listUsers,
   getUserDetails,
@@ -237,4 +278,6 @@ module.exports = {
   reverseExternalTransfer,
   listAdmins,
   updateAdminStatus,
+  deleteUser,
+  deleteTransaction,
 };

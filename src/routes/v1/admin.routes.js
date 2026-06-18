@@ -76,13 +76,8 @@ router.get('/transactions', transactionListValidator, validate, adminController.
 router.get('/transactions/failed', adminController.listFailedTransactions);
 router.get('/transactions/reversed', adminController.listReversedTransactions);
 router.get('/transactions/:id', adminController.getTransactionById);
-router.post(
-  '/transactions/:id/reverse',
-  requireRole('superadmin', 'admin', 'compliance'),
-  reverseTransactionValidator,
-  validate,
-  adminController.reverseTransaction
-);
+router.delete('/transactions/:id', requireRole('superadmin', 'admin'), adminController.deleteTransaction);
+router.post('/transactions/:id/reverse', requireRole('superadmin', 'admin', 'compliance'), reverseTransactionValidator, validate, adminController.reverseTransaction);
 
 // ============================================================
 // EXTERNAL TRANSFERS

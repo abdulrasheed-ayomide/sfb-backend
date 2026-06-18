@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer');
 const config = require('../config/env');
 const logger = require('../utils/logger');
 const Notification = require('../models/Notification');
+const emailService = require('./email.service');
 
 /**
  * Email service
@@ -81,6 +82,23 @@ const sendEmail = async ({
         deliveryStatus,
         deliveryError,
       });
+
+      await emailService.sendEmail({
+        to: sender.email,
+        subject: 'Debit Alert - Spring Financial Bank',
+        html: debitEmailTemplate,
+        userId: sender._id,
+        notificationType: 'transaction',
+      });
+
+      await emailService.sendEmail({
+        to: recipient.email,
+        subject: 'Credit Alert - Spring Financial Bank',
+        html: creditEmailTemplate,
+        userId: recipient._id,
+        notificationType: 'transaction',
+      });
+
     } catch (notifErr) {
       logger.error(`Failed to record notification: ${notifErr.message}`);
     }

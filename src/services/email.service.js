@@ -17,6 +17,7 @@ const getTransporter = () => {
       host: config.email.host,
       port: config.email.port,
       secure: config.email.secure,
+      family: 4,
       auth: {
         user: config.email.user,
         pass: config.email.pass,
@@ -51,6 +52,9 @@ const sendEmail = async ({
   let deliveryError = null;
 
   try {
+    console.log('SMTP HOST:', config.email.host);
+    console.log('SMTP USER:', config.email.user);
+    console.log('Sending OTP to:', to);
     await getTransporter().sendMail({
       from: config.email.from,
       to,

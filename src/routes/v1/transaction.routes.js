@@ -20,10 +20,10 @@ router.get('/banks', transactionController.getBankList);
 
 // Internal transfer
 router.get('/verify-recipient', verifyRecipientValidator, validate, transactionController.verifyRecipient);
-// router.post('/transfer', transferLimiter, initiateTransferValidator, validate, transactionController.transfer);
-router.post('/transfer', (req, res) => {
-  res.send('working');
-});
+router.post('/transfer', transferLimiter, transferValidator, validate, transactionController.transfer);
+// router.post('/transfer', (req, res) => {
+//   res.send('working');
+// });
 
 // External transfer
 router.get('/verify-external', transactionController.verifyExternalAccount);
@@ -35,6 +35,6 @@ router.get('/:reference/receipt', transactionController.getReceipt);
 router.get('/:reference', transactionController.getByReference);
 
 // console.log('transferLimiter:', transferLimiter);
-// console.log('initiateTransferValidator:', initiateTransferValidator);
+// console.log('transferValidator:', transferValidator);
 // console.log('transfer controller:', transactionController.transfer);
 module.exports = router;

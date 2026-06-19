@@ -45,21 +45,9 @@ router.post(
 // ============================================================
 router.get('/users', userListValidator, validate, adminController.listUsers);
 router.get('/users/:id', adminController.getUserDetails);
-router.patch(
-  '/users/:id/status',
-  requireRole('superadmin', 'admin', 'compliance'),
-  updateUserStatusValidator,
-  validate,
-  adminController.updateUserStatus
-);
-router.patch(
-  '/users/:id/kyc',
-  requireRole('superadmin', 'admin', 'compliance'),
-  updateKycStatusValidator,
-  validate,
-  adminController.updateKycStatus
-);
-
+router.patch('/users/:id/status', requireRole('superadmin', 'admin', 'compliance'), updateUserStatusValidator, validate, adminController.updateUserStatus);
+router.patch('/users/:id/kyc', requireRole('superadmin', 'admin', 'compliance'), updateKycStatusValidator, validate, adminController.updateKycStatus);
+router.delete('/users/:id', requireRole('superadmin', 'admin'), adminController.deleteUser);
 // ============================================================
 // CREDIT ACCOUNT (Admin Only - customers cannot access)
 // ============================================================

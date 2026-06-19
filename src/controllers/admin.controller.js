@@ -228,9 +228,9 @@ const updateAdminStatus = asyncHandler(async (req, res) => {
 //  * @param {ObjectId} params.id - User ID to delete
 
 const deleteUser = asyncHandler(async (req, res) => {
-  const user = await User.findByIdAndDelete(req.params.id);
+  const deletedUser = await User.findByIdAndDelete(req.params.id);
 
-  if (!user) {
+  if (!deletedUser) {
     return res.status(404).json({
       success: false,
       message: 'User not found',

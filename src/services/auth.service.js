@@ -253,7 +253,13 @@ const loginUser = async ({ email, password }, meta = {}) => {
   }
 
   if (!user.isEmailVerified) {
-    throw new ForbiddenError('Please verify your email before logging in');
+    const error = new ForbiddenError(
+      'Please verify your email before logging in.'
+    );
+
+    error.errorCode = 'EMAIL_NOT_VERIFIED';
+
+    throw error;
   }
 
   if (user.accountStatus === 'suspended') {

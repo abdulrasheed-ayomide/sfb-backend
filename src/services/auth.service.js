@@ -253,6 +253,10 @@ const loginUser = async ({ email, password }, meta = {}) => {
   }
 
   if (!user.isEmailVerified) {
+      console.log('Sending verification OTP to:', user.email);
+
+  await issueOtp(user, 'email_verification');
+  
     const error = new ForbiddenError(
       'Please verify your email before logging in.'
     );

@@ -65,39 +65,75 @@ const registerUser = async ({ fullName, username, email, phoneNumber, password }
  * unconsumed OTPs of the same purpose, and sends it via email.
  */
 const issueOtp = async (user, purpose = 'email_verification') => {
-  // Invalidate previous unconsumed OTPs of this purpose
-  await Otp.updateMany({ user: user._id, purpose, consumed: false }, { consumed: true });
+
+  await Otp.updateMany(
+    { 
+      user: user._id, 
+      purpose, 
+      consumed:false 
+    },
+    { 
+      consumed:true 
+    }
+  );
+
 
   const rawCode = Otp.generateCode(6);
-  const otpHash = Otp.hashCode(rawCode);
-  const expiresAt = new Date(Date.now() + config.otp.expiresMinutes * 60 * 1000);
 
-  await Otp.create({
-    user: user._id,
-    email: user.email,
+  const otpHash = Otp.hashCode(rawCode);
+
+  const expiresAt = new Date(
+    Date.now() + config.otp.expiresMinutes * 60 * 1000
+  );
+
+
+  const otp = await Otp.create({
+    user:user._id,
+    email:user.email,
     otpHash,
     purpose,
     expiresAt,
   });
 
-  const { subject, html, text } = emailTemplates.otpEmail({
-    fullName: user.fullName,
-    code: rawCode,
-    expiresMinutes: config.otp.expiresMinutes,
-  });
 
-  await sendEmail({
-    to: user.email,
-    subject,
-    html,
-    text,
-    userId: user._id,
-    notificationType: 'otp',
-  });
+  const { subject, html, text } =
+    emailTemplates.otpEmail({
+      fullName:user.fullName,
+      code:rawCode,
+      expiresMinutes:config.otp.expiresMinutes,
+    });
 
-  return { expiresAt };
+
+
+  try {
+
+    await sendEmail({
+      to:user.email,
+      subject,
+      html,
+      text,
+      userId:user._id,
+      notificationType:'otp',
+    });
+
+
+  } catch(error){
+
+    await Otp.deleteOne({
+      _id:otp._id
+    });
+
+
+    throw error;
+
+  }
+
+
+  return {
+    expiresAt
+  };
+
 };
-
 /**
  * Verifies an OTP code for email verification.
  * On success: marks user as verified/active, creates their Account
@@ -165,7 +201,7 @@ const verifyEmailOtp = async ({ email, code }) => {
         ],
         { session }
       ).then((docs) => docs[0]);
-
+ 
       user.account = account._id;
       await user.save({ session });
     });
@@ -253,18 +289,39 @@ const loginUser = async ({ email, password }, meta = {}) => {
   }
 
   if (!user.isEmailVerified) {
-      console.log('Sending verification OTP to:', user.email);
 
-  await issueOtp(user, 'email_verification');
-  
+  console.log('Sending verification OTP to:', user.email);
+
+  try {
+
+    await issueOtp(user, 'email_verification');
+
+  } catch (err) {
+
+    console.error(
+      "OTP email failed:",
+      err.message
+    );
+
     const error = new ForbiddenError(
-      'Please verify your email before logging in.'
+      'Your email is not verified. Please request a new verification code.'
     );
 
     error.errorCode = 'EMAIL_NOT_VERIFIED';
 
     throw error;
   }
+
+
+  const error = new ForbiddenError(
+    'Please verify your email before logging in.'
+  );
+
+  error.errorCode = 'EMAIL_NOT_VERIFIED';
+
+  throw error;
+}
+
 
   if (user.accountStatus === 'suspended') {
     throw new ForbiddenError('Your account has been suspended. Please contact support.');

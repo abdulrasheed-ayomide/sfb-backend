@@ -11,14 +11,15 @@ let transporter;
 const getTransporter = () => {
   if (!transporter) {
     transporter = nodemailer.createTransport({
-      host: config.email.host,
-      port: config.email.port,
-      secure: config.email.secure,
-      auth: {
-        user: config.email.user,
-        pass: config.email.pass,
-      },
-    });
+  host: config.email.host || "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  family: 4,
+  auth:{
+    user: config.email.user,
+    pass: config.email.pass
+  },
+});
   }
 
   return transporter;
@@ -55,13 +56,20 @@ const sendEmail = async ({
     console.log('Email sent successfully');
     deliveryStatus = 'sent';
   } catch (error) {
-    deliveryStatus = 'failed';
-    deliveryError = error.message;
 
-    logger.error(
-      `Failed to send email to ${to}: ${error.message}`
-    );
-  }
+ deliveryStatus='failed';
+
+ deliveryError=error.message;
+
+
+ logger.error(
+  `Failed to send email to ${to}: ${error.message}`
+ );
+
+
+ throw error;
+
+}
 
   try {
     if (userId) {

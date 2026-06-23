@@ -22,7 +22,19 @@ const getTransporter = () => {
 });
   }
 
-  return transporter;
+  // return transporter;
+  transporter.verify((error, success)=>{
+
+ if(error){
+   console.log("SMTP VERIFY ERROR:", error);
+ }
+ else{
+   console.log("SMTP SERVER READY");
+ }
+
+});
+
+return transporter;
 };
 
 /**
@@ -57,9 +69,10 @@ const sendEmail = async ({
     deliveryStatus = 'sent';
   } catch (error) {
 
- deliveryStatus='failed';
+ console.error("FULL EMAIL ERROR:", error);
 
- deliveryError=error.message;
+ deliveryStatus = 'failed';
+ deliveryError = error.message;
 
 
  logger.error(
@@ -68,7 +81,6 @@ const sendEmail = async ({
 
 
  throw error;
-
 }
 
   try {

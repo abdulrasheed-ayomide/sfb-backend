@@ -11,13 +11,17 @@ let transporter;
 const getTransporter = () => {
   if (!transporter) {
     transporter = nodemailer.createTransport({
-  host: config.email.host || "smtp.gmail.com",
-  port: 465,
-  secure: true,
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  requireTLS: true,
   family: 4,
   auth:{
     user: config.email.user,
     pass: config.email.pass
+  },
+  tls:{
+    rejectUnauthorized:false
   },
 });
   }

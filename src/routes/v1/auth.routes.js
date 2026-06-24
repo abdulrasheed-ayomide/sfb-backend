@@ -13,6 +13,9 @@ const {
   changePasswordValidator,
 } = require('../../validators/auth.validator');
 
+// testing
+const { sendEmail } = require('../../services/email.service');
+
 const router = express.Router();
 
 router.post('/register', authLimiter, registerValidator, validate, authController.register);
@@ -25,6 +28,7 @@ router.post('/forgot-password', authLimiter, forgotPasswordValidator, validate, 
 router.post('/reset-password', authLimiter, resetPasswordValidator, validate, authController.resetPassword);
 router.post('/change-password', protectCustomer, changePasswordValidator, validate, authController.changePassword);
 router.get('/me', protectCustomer, authController.getMe);
+// testing 
 router.get('/test-email', async (req, res) => {
   try {
     await sendEmail({
@@ -41,6 +45,13 @@ router.get('/test-email', async (req, res) => {
       error: err.message,
     });
   }
+});
+router.get('/smtp-check', (req, res) => {
+  res.json({
+    SMTP_USER: process.env.SMTP_USER,
+    HAS_PASSWORD: !!process.env.SMTP_PASS,
+    EMAIL_FROM: process.env.EMAIL_FROM,
+  });
 });
 
 module.exports = router;

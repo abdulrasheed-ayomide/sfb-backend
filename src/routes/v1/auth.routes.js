@@ -23,13 +23,24 @@ router.post('/refresh', authController.refresh);
 router.post('/logout', protectCustomer, authController.logout);
 router.post('/forgot-password', authLimiter, forgotPasswordValidator, validate, authController.forgotPassword);
 router.post('/reset-password', authLimiter, resetPasswordValidator, validate, authController.resetPassword);
-router.post(
-  '/change-password',
-  protectCustomer,
-  changePasswordValidator,
-  validate,
-  authController.changePassword
-);
+router.post('/change-password', protectCustomer, changePasswordValidator, validate, authController.changePassword);
 router.get('/me', protectCustomer, authController.getMe);
+router.get('/test-email', async (req, res) => {
+  try {
+    await sendEmail({
+      to: 'yourtestemail@gmail.com',
+      subject: 'SMTP Test',
+      html: '<h1>Hello</h1>',
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
+  }
+});
 
 module.exports = router;

@@ -17,34 +17,15 @@ dns.lookup('smtp.gmail.com', (err, address, family) => {
 const getTransporter = () => {
   if (!transporter) {
     transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  family: 4,
-  auth:{
+       service: 'gmail',
+  auth: {
     user: config.email.user,
-    pass: config.email.pass
-  },
-  tls:{
-    rejectUnauthorized:false
+    pass: config.email.pass,
   },
 });
   }
 
-  // return transporter;
-  transporter.verify((error, success)=>{
-
- if(error){
-   console.log("SMTP VERIFY ERROR:", error);
- }
- else{
-   console.log("SMTP SERVER READY");
- }
-
-});
-
-return transporter;
+  return transporter;
 };
 
 /**

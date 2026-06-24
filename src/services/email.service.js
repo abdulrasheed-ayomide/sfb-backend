@@ -5,6 +5,12 @@ const Notification = require('../models/Notification');
 
 let transporter;
 
+const dns = require('dns');
+
+dns.lookup('smtp.gmail.com', (err, address, family) => {
+  console.log('SMTP RESOLVED TO:', address);
+  console.log('IP FAMILY:', family);
+});
 /**
  * Create SMTP transporter once and reuse it.
  */

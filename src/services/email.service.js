@@ -5,24 +5,20 @@ const Notification = require('../models/Notification');
 
 let transporter;
 
-const dns = require('dns');
-
-dns.lookup('smtp.gmail.com', (err, address, family) => {
-  console.log('SMTP RESOLVED TO:', address);
-  console.log('IP FAMILY:', family);
-});
 /**
  * Create SMTP transporter once and reuse it.
  */
 const getTransporter = () => {
   if (!transporter) {
     transporter = nodemailer.createTransport({
-       service: 'gmail',
+     host: config.email.host,
+  port: config.email.port,
+  secure: config.email.secure,
   auth: {
     user: config.email.user,
     pass: config.email.pass,
   },
-});
+    });
   }
 
   return transporter;
@@ -59,20 +55,13 @@ const sendEmail = async ({
     console.log('Email sent successfully');
     deliveryStatus = 'sent';
   } catch (error) {
+    deliveryStatus = 'failed';
+    deliveryError = error.message;
 
- console.error("FULL EMAIL ERROR:", error);
-
- deliveryStatus = 'failed';
- deliveryError = error.message;
-
-
- logger.error(
-  `Failed to send email to ${to}: ${error.message}`
- );
-
-
- throw error;
-}
+    logger.error(
+      `Failed to send email to ${to}: ${error.message}`
+    );
+  }
 
   try {
     if (userId) {

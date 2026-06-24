@@ -56,7 +56,7 @@ const config = {
   },
 
   email: {
-    host: process.env.SMTP_HOST,
+    host: process.env.SMTP_HOST,  
     port: parseInt(process.env.SMTP_PORT, 10) || 587,
     secure: process.env.SMTP_SECURE === 'true',
     user: process.env.SMTP_USER,
